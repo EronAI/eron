@@ -1,0 +1,23 @@
+Eron: An AI-Powered Financial & Business Dashboard
+
+Eron is a smart, all-in-one platform that helps both individuals and entrepreneurs take full control of their money. It blends a clean, intuitive dashboard with an integrated AI assistant, turning complicated financial data into simple, actionable insights.
+
+Core Purpose
+
+Eron is designed to support every aspect of financial life—from personal budgeting to business growth. It automates analysis, highlights key trends, and provides tailored guidance, acting like a virtual financial advisor for anyone who wants clarity and control.
+
+Built on the principle of giving every dollar a purpose, Eron focuses on proactive planning rather than just tracking. It helps users prepare for upcoming expenses, split big costs into manageable steps, and adapt flexibly when life changes. Over time, this method builds stability—whether that means a family saving for the future or a business owner improving cash flow and profitability.
+
+Key Features
+
+Personal Finance Management: Track income, expenses, savings goals, and debt payoff with ease.
+
+Business Dashboard: Manage multiple businesses or side projects, monitor KPIs like Profit Margin and Net Worth, and compare performance across ventures.
+
+Interactive Data Visualization: Explore finances through dynamic charts—spending trends, savings growth, monthly revenue, and cumulative wealth.
+
+AI-Powered Assistant: Ask questions in natural language and get personalized recommendations, whether it’s advice on cutting household costs or optimizing business cash flow.
+
+Multi-Profile Support: Switch seamlessly between personal, family, and business accounts—all in one platform.
+
+✨ In summary, Eron is both a personal budgeting tool and a business growth companion. It empowers everyday people to plan, save, and achieve stability while giving entrepreneurs the insights and guidance they need to grow. One platform, two powerful sides of financial life.
