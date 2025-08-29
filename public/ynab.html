@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YNAB-like Budget</title>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="static/styles.css" />
+  </head>
+  <body>
+    
+    <div class="topbar">
+      <div class="brand-container">
+        <div class="brand">E</div>
+        <span class="brand-name">Eron</span>
+      </div>
+      
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="dash.html">Dashboard</a>
+        <a href="ynab.html" class="active">Budget</a>
+        <a href="ai-assistant.html">AI</a>
+      </nav>
+      <div class="topbar-actions">
+        <button class="small" id="theme-toggle-btn">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width: 16px; height: 16px;"><path fill-rule="evenodd" d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM5.636 5.636a.75.75 0 011.06 0l1.06 1.06a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zM2 10a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5A.75.75 0 012 10zm1.06 4.44a.75.75 0 011.06 0l1.06 1.06a.75.75 0 11-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zM10 18a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5A.75.75 0 0110 18zm3.293-2.707a.75.75 0 010 1.06l-1.06 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zM18 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0118 10zm-1.06-4.44a.75.75 0 010-1.06l-1.06-1.06a.75.75 0 01-1.06 1.06l1.06 1.06a.75.75 0 011.06 0zM10 7a3 3 0 100 6 3 3 0 000-6z" clip-rule="evenodd"></path></svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width: 16px; height: 16px; display: none;"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+        </button>
+        <button class="small" id="add-group-btn">
+          <svg class="add-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+          <span class="btn-text">Add Category Group</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="container container-full-width">
+      <main>
+        <div class="card kpi kpi-header">
+          <div class="label">Ready to Assign</div>
+          <div class="value" id="ready-to-assign">$0.00</div>
+        </div>
+
+        <div class="overall-progress-card">
+          <div class="progress-label">
+            <span>Overall Funding</span>
+            <span id="overall-percentage">0%</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" id="overall-progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="category-grid">
+          <!-- Category cards will be inserted here by JavaScript -->
+        </div>
+      </main>
+    </div>
+
+    <template id="category-card-template">
+      <div class="category-card" data-id="">
+        <div class="card-header">
+          <div class="category-info view-mode">
+            <span class="emoji"></span>
+            <span class="name"></span>
+          </div>
+          <div class="category-edit-inputs edit-mode">
+            <input type="text" class="edit-emoji" maxlength="2" />
+            <input type="text" class="edit-name" placeholder="Category Name" />
+          </div>
+          <div class="header-actions">
+            <button class="small edit-btn">
+              <svg class="pen-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a1 1 0 00.46-.283l8.48-8.48-3.536-3.535-8.48 8.48a1 1 0 00-.283.46zM14.828.172a.5.5 0 00-.707 0l-1.707 1.707 3.535 3.535 1.707-1.707a.5.5 0 000-.707l-2.828-2.828z"></path></svg>
+              <svg class="save-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+            </button>
+            <button class="small danger delete-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="available-amount view-mode"></div>
+          <input type="text" class="edit-available edit-mode" />
+          <div class="budgeted-info">
+             Budgeted:
+             <span class="budgeted-amount view-mode"></span>
+             <input type="text" class="edit-budgeted edit-mode" />
+           </div>
+          <div class="progress-container view-mode">
+            <div class="progress-bar"></div>
+          </div>
+        </div>
+        <div class="card-actions">
+          <input type="text" class="assign-input small" placeholder="0.00" />
+          <button class="small assign-btn">Assign</button>
+        </div>
+      </div>
+    </template>
+
+    <div class="mobile-nav">
+      <a href="index.html">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="dash.html">
+         <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 10a8 8 0 018-8v8h8a8 8 0 01-8 8v-8H2z"></path>
+          <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="ynab.html" class="active">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg>
+        <span>Budget</span>
+      </a>
+      <a href="ai-assistant.html">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 2zM5.404 5.404a.75.75 0 010 1.06l-2.475 2.475a.75.75 0 11-1.06-1.06L4.344 5.404a.75.75 0 011.06 0zm9.192 0a.75.75 0 011.06 0l2.475 2.475a.75.75 0 11-1.06 1.06L15.656 6.464a.75.75 0 010-1.06zM2 10a.75.75 0 01.75-.75h3.5a.75.75 0 010 1.5h-3.5A.75.75 0 012 10zm14.25 0a.75.75 0 010 1.5h-3.5a.75.75 0 010-1.5h3.5zM5.404 14.596a.75.75 0 011.06 0l-2.475 2.475a.75.75 0 01-1.06-1.06l2.475-2.475zm9.192 0a.75.75 0 010 1.06l2.475 2.475a.75.75 0 11-1.06 1.06l-2.475-2.475a.75.75 0 011.06 0zM10 15a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 15z" clip-rule="evenodd"></path></svg>
+        <span>AI</span>
+      </a>
+      <button id="mobile-theme-toggle-btn">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM5.636 5.636a.75.75 0 011.06 0l1.06 1.06a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zM2 10a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5A.75.75 0 012 10zm1.06 4.44a.75.75 0 011.06 0l1.06 1.06a.75.75 0 11-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zM10 18a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0v1.5A.75.75 0 0110 18zm3.293-2.707a.75.75 0 010 1.06l-1.06 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zM18 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0118 10zm-1.06-4.44a.75.75 0 010-1.06l-1.06-1.06a.75.75 0 01-1.06 1.06l1.06 1.06a.75.75 0 011.06 0zM10 7a3 3 0 100 6 3 3 0 000-6z" clip-rule="evenodd"></path></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="display: none;"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+        <span>Theme</span>
+      </button>
+    </div>
+
+    <script>
+      // Helper functions
+      const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(amount);
+      };
+
+      const parseCurrency = (str) => {
+        // Ensure str is a string before calling replace
+        return parseFloat(String(str).replace(/[^0-9.-]+/g, '')) || 0;
+      };
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const readyToAssignEl = document.getElementById('ready-to-assign');
+        const grid = document.querySelector('.category-grid');
+        const addGroupBtn = document.getElementById('add-group-btn');
+        let readyToAssign = 0;
+
+        // Data for the budget categories
+        let categories = [];
+
+        function saveData() {
+          localStorage.setItem('budgetData', JSON.stringify({ categories, readyToAssign }));
+        }
+
+        function loadData() {
+          const data = localStorage.getItem('budgetData');
+          if (data) {
+            const parsedData = JSON.parse(data);
+            categories = parsedData.categories || [];
+            readyToAssign = parsedData.readyToAssign || 1000; // Default to 1000 if not set
+          } else {
+            // Default data if nothing in localStorage
+            categories = [
+              { id: 1, emoji: '🏠', name: 'Rent', budgeted: 1200, available: 1200 },
+              { id: 2, emoji: '🛒', name: 'Groceries', budgeted: 400, available: 150.55 },
+              { id: 3, emoji: '🚗', name: 'Transportation', budgeted: 150, available: 150 },
+              { id: 4, emoji: '💡', name: 'Utilities', budgeted: 200, available: 50 },
+              { id: 5, emoji: '🍽️', name: 'Dining Out', budgeted: 100, available: 25.70 },
+            ];
+            readyToAssign = 1000;
+            saveData();
+          }
+        }
+
+        function updateReadyToAssign() {
+          readyToAssignEl.textContent = formatCurrency(readyToAssign);
+        }
+
+        function updateCardUI(card, category) {
+          card.querySelector('.emoji').textContent = category.emoji;
+          card.querySelector('.name').textContent = category.name;
+          card.querySelector('.available-amount').textContent = formatCurrency(category.available);
+          card.querySelector('.budgeted-amount').textContent = formatCurrency(category.budgeted);
+
+          const availableAmountEl = card.querySelector('.available-amount');
+          if (category.available < 0) {
+            availableAmountEl.classList.add('pct-negative');
+            availableAmountEl.classList.remove('pct-positive', 'pct-neutral');
+          } else if (category.available > 0) {
+            availableAmountEl.classList.add('pct-positive');
+            availableAmountEl.classList.remove('pct-negative', 'pct-neutral');
+          } else {
+            availableAmountEl.classList.add('pct-neutral');
+            availableAmountEl.classList.remove('pct-positive', 'pct-negative');
+          }
+          
+          const progress = card.querySelector('.progress-bar');
+          const percentage = category.budgeted > 0 ? (category.available / category.budgeted) * 100 : 0;
+          progress.style.width = `${Math.min(percentage, 100)}%`;
+
+          progress.classList.remove('overspent', 'funded');
+
+          if (percentage >= 100) {
+            progress.classList.add('funded');
+          }
+          if (percentage > 100) { // Overspent is a separate state
+            progress.classList.add('overspent');
+          }
+        }
+
+        function updateOverallProgress() {
+          const overallProgressBar = document.getElementById('overall-progress-bar');
+          const overallPercentageEl = document.getElementById('overall-percentage');
+
+          const totalBudgeted = categories.reduce((sum, cat) => sum + cat.budgeted, 0);
+          const totalAvailable = categories.reduce((sum, cat) => sum + cat.available, 0);
+
+          const percentage = totalBudgeted > 0 ? (totalAvailable / totalBudgeted) * 100 : 0;
+
+          overallProgressBar.style.width = `${Math.min(percentage, 100)}%`;
+          overallPercentageEl.textContent = `${Math.round(percentage)}%`;
+
+          overallProgressBar.classList.remove('overspent', 'funded');
+          if (percentage >= 100) overallProgressBar.classList.add('funded');
+          if (percentage > 100) overallProgressBar.classList.add('overspent');
+        }
+
+        function initialize() {
+          loadData();
+          updateReadyToAssign();
+          updateOverallProgress();
+          grid.innerHTML = ''; // Clear existing cards
+
+          categories.forEach((category) => {
+            const card = document.getElementById('category-card-template').content.cloneNode(true).firstElementChild;
+            card.dataset.id = category.id;
+            grid.appendChild(card);
+            updateCardUI(card, category);
+            addCardEventListeners(card, category.id);
+          });
+        }
+
+        function addCardEventListeners(card, id) {
+          card.addEventListener('click', (e) => {
+            const category = categories.find((c) => c.id === id);
+            if (!category) return;
+
+            if (e.target.matches('.assign-btn')) {
+              const input = card.querySelector('.assign-input');
+              const amount = parseCurrency(input.value);
+              const newAvailable = category.available + amount;
+
+              if (amount > 0 && newAvailable <= category.budgeted) {
+                readyToAssign -= amount;
+                category.available += amount;
+                input.value = '';
+                updateCardUI(card, category);
+                updateReadyToAssign();
+                updateOverallProgress();
+                saveData();
+              } else if (amount > 0) {
+                const canAssign = category.budgeted - category.available;
+                alert(`You can't assign more than the budgeted amount. You can assign up to ${formatCurrency(canAssign > 0 ? canAssign : 0)}.`);
+              }
+            } else if (e.target.closest('.edit-btn')) {
+              const isEditing = card.classList.toggle('is-editing');
+              if (isEditing) {
+                card.querySelector('.edit-emoji').value = category.emoji;
+                card.querySelector('.edit-name').value = category.name;
+                card.querySelector('.edit-budgeted').value = category.budgeted;
+                card.querySelector('.edit-available').value = category.available;
+              } else { // This is the "Save" action
+                const newBudgeted = parseCurrency(card.querySelector('.edit-budgeted').value);
+                const newAvailable = parseCurrency(card.querySelector('.edit-available').value);
+
+                // Validation: Available cannot be greater than Budgeted.
+                if (newAvailable > newBudgeted) {
+                  alert("The 'Available' amount cannot be greater than the 'Budgeted' amount.");
+                  return; // Stop the save if validation fails
+                }
+
+                const oldAvailable = category.available;
+                const availableDiff = newAvailable - oldAvailable;
+
+                // Update Ready to Assign based on the change in available money
+                readyToAssign -= availableDiff;
+
+                category.emoji = card.querySelector('.edit-emoji').value;
+                category.name = card.querySelector('.edit-name').value;
+                category.budgeted = newBudgeted;
+                category.available = newAvailable;
+                updateCardUI(card, category);
+                updateReadyToAssign();
+                updateOverallProgress();
+                saveData();
+              }
+            } else if (e.target.closest('.delete-btn')) {
+              if (confirm(`Are you sure you want to delete the "${category.name}" category? This will move ${formatCurrency(category.available)} back to Ready to Assign.`)) {
+                const index = categories.findIndex(c => c.id === id);
+                if (index > -1) {
+                  // Return the available money to Ready to Assign
+                  readyToAssign += category.available;
+                  updateReadyToAssign();
+                  updateOverallProgress();
+
+                  categories.splice(index, 1);
+                  grid.removeChild(card);
+                  saveData();
+                }
+              }
+            }
+          });
+        }
+
+        addGroupBtn.addEventListener('click', () => {
+          const newId = categories.length > 0 ? Math.max(...categories.map(c => c.id)) + 1 : 1;
+          const newCategory = {
+            id: newId,
+            emoji: '💡',
+            name: 'New Category',
+            budgeted: 0,
+            available: 0,
+          };
+
+          categories.push(newCategory);
+
+          const card = document.getElementById('category-card-template').content.cloneNode(true).firstElementChild;
+          card.dataset.id = newCategory.id;
+          grid.appendChild(card);
+          
+          addCardEventListeners(card, newCategory.id);
+
+          // Enter edit mode immediately for the new card
+          card.classList.add('is-editing');
+          card.querySelector('.edit-emoji').value = newCategory.emoji;
+          card.querySelector('.edit-name').value = newCategory.name;
+          card.querySelector('.edit-budgeted').value = newCategory.budgeted;
+          
+          updateOverallProgress();
+          saveData(); // Save the new category to localStorage
+
+          card.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          card.querySelector('.edit-name').focus();
+        });
+
+        // --- Theme Toggler ---
+        const themeToggleBtns = document.querySelectorAll('#theme-toggle-btn, #mobile-theme-toggle-btn');
+
+        const applyTheme = (theme) => {
+          if (theme === 'light') {
+            document.body.classList.add('light-mode');
+          } else {
+            document.body.classList.remove('light-mode');
+          }
+
+          // Update icons on all toggle buttons
+          themeToggleBtns.forEach(btn => {
+            const sunIcon = btn.querySelector('.sun-icon');
+            const moonIcon = btn.querySelector('.moon-icon');
+            if (sunIcon && moonIcon) {
+              sunIcon.style.display = theme === 'light' ? 'none' : 'block';
+              moonIcon.style.display = theme === 'light' ? 'block' : 'none';
+            }
+          });
+        };
+
+        themeToggleBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const newTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+          });
+        });
+
+        applyTheme(localStorage.getItem('theme') || 'dark'); // Apply saved theme or default to dark
+
+        initialize();
+      });
+    </script>
+  </body>
+</html>

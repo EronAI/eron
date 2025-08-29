@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #051426;
+            --bg-darker: #061827;
+            --color-navy: #0E3A5F;
+            --color-green: #22c55e;
+            --color-blue: #06b6d4;
+            --text-light: #ffffff;
+            --text-muted: #9aa8bf;
+            --radius: 14px;
+        }
+
+        * { box-sizing: border-box; margin:0; padding:0; font-family: "Segoe UI", sans-serif; }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* Placeholder */
+        #placeholder {
+            /* position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%; /* To center vertically in the container */
+            font-size: 1.2rem;
+            color: white;
+            text-align: center;
+            line-height: 1.6;
+            z-index: 1;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #placeholder-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        #placeholder-examples {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .example-prompt {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgb(78, 100, 87);
+            border-radius: 999px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            
+            /* Gradient text */
+            background-image: linear-gradient(135deg, var(--color-green), var(--color-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .example-prompt:hover{
+            transform: scale(1.01);
+        }
+        .copy-btn {
+            background: transparent;
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s ease, background-color 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .copy-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--text-muted);
+        }
+        .chat-container {
+            flex: 1;
+            width: 100%;
+            max-width: 700px;
+            overflow-y: auto;
+            padding: 10px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .message-wrapper-user,
+        .message-wrapper-ai {
+            display: flex;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .message-wrapper-user {
+            justify-content: flex-end;
+        }
+
+        .message-wrapper-ai {
+            justify-content: flex-start;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            max-width: 90%; /* Increased max-width for AI messages */
+        }
+
+        .message.ai {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            color: var(--text-light);
+            min-width: 50px;
+        }
+
+        .message-content {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .user {
+            background: var(--color-navy);
+            color: var(--text-light);
+        }
+
+        .input-container {
+            display: flex;
+            width: 100%;
+            max-width: 700px;
+            gap: 8px;
+            position: relative;
+            box-shadow: 0px -15px 30px 10px var(--bg-dark);
+            z-index: 1;
+        }
+
+        /* Input Wrapper for the animated gradient border */
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+            border-radius: 999px;
+            padding: 2px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 2px;
+            border-radius: 999px;
+            background: linear-gradient(
+                45deg,
+                var(--color-green),
+                var(--color-blue),
+                var(--color-green)
+            );
+            background-size: 200% 200%;
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .input-wrapper.active::before {
+            opacity: 1;
+            animation: gradient-anim 2s linear infinite;
+        }
+
+        @keyframes gradient-anim {
+            to {
+                background-position: 200% center;
+            }
+        }
+        
+        input {
+            flex: 1;
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 999px;
+            border: none;
+            outline: none;
+            background: #0a1c33;
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 500;
+            transition: 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        button {
+            padding: 0 18px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, var(--color-green), var(--color-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: black;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        }
+
+        button svg {
+            width: 20px;
+            height: 20px;
+            fill: black;
+        }
+
+        /* Navbar Layout */
+        .new-navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 900px;
+            padding: 15px 25px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            z-index: 2;
+        }
+
+        .new-navbar .brand-logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--color-green);
+            margin-right: 15px;
+        }
+        
+        .new-navbar .links-and-logo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .new-navbar h1 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .new-navbar nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        .new-navbar nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 8px 15px;
+            border-radius: var(--radius);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .new-navbar nav a:hover {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--color-green);
+        }
+
+        .new-navbar nav a.new-active {
+            background: linear-gradient(135deg, var(--color-green) 0%, var(--color-blue) 100%);
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+        }
+
+        /* Styling for the new "Back" button */
+        .return-button {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: bold;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 999px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .return-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 2px;
+            border-radius: 999px;
+            background: linear-gradient(45deg, var(--color-green), var(--color-blue));
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            z-index: -1;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .return-button:hover::before {
+            opacity: 1;
+        }
+
+        .return-button svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--text-light);
+            transition: transform 0.3s ease;
+        }
+        
+        .return-button:hover svg {
+            transform: translateX(-3px);
+        }
+
+        /* Mobile Layout */
+        @media (max-width: 600px) {
+            .new-navbar .links-and-logo {
+                display: none;
+            }
+            .new-navbar nav {
+                display: none;
+            }
+            .return-button {
+                display: flex;
+            }
+            .new-navbar {
+                justify-content: space-between;
+                padding: 10px 15px;
+            }
+            .new-navbar .mobile-title-container {
+                display: flex;
+                align-items: center;
+                flex: 1;
+                justify-content: center;
+            }
+            .new-navbar .mobile-title-container .brand-logo,
+            .new-navbar .mobile-title-container h1 {
+                display: initial;
+            }
+            .new-navbar .mobile-title-container h1 {
+                font-size: 1rem;
+            }
+            .navbar-right-placeholder {
+                visibility: hidden;
+                width: 48px;
+            }
+        }
+        
+        /* Desktop Layout */
+        @media (min-width: 601px) {
+            .return-button,
+            .mobile-title-container,
+            .navbar-right-placeholder {
+                display: none;
+            }
+            .new-navbar .links-and-logo,
+            .new-navbar nav {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="new-navbar">
+        <div class="links-and-logo">
+            <div class="brand-logo">AI</div>
+            <h1>EronAI</h1>
+        </div>
+        <nav>
+            <a href="./index.html">Home</a>
+            <a href="./dash.html">Dashboard</a>
+            <a href="./ynab.html">Budget</a>
+            <a href="./ai-assistant.html" class="new-active">AI</a>
+        </nav>
+
+        <a href="./index.html" class="return-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+            Back
+        </a>
+        <div class="mobile-title-container">
+            <div class="brand-logo">AI</div>
+            <h1>EronAI</h1>
+        </div>
+        <div class="navbar-right-placeholder"></div>
+    </header>
+
+    <div class="chat-container" id="chat-container">
+        <div id="placeholder">
+            <div id="placeholder-title">Hello! I'm Eron.</div>
+            I'm your new AI assistant.<br>
+            You can ask me things like:
+            <div id="placeholder-examples">
+                <a class="example-prompt">Give me insights on my projects.</a>
+                <a class="example-prompt">Show trends and ways to improve cash flow.</a>
+                <a class="example-prompt">Analyze my budgets and suggest savings.</a>
+            </div>
+        </div>
+        <div id="chat"></div>
+    </div>
+    <div class="input-container">
+        <div class="input-wrapper">
+            <input id="question" type="text" placeholder="Ask EronAI anything..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+        </div>
+        <button onclick="sendQuestion()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="transform: rotate(90deg);"><path d="M2 12l18-12v24z"/></svg>
+        </button>
+    </div>
+    <span style="font-size: small; color: gray; text-align: center; margin-top: 5px;">EronAI can make mistakes. Check important info.</span>
+
+    <script>
+        const chatDiv = document.getElementById("chat");
+        const chatContainer = document.getElementById("chat-container");
+        const placeholder = document.getElementById("placeholder");
+        const input = document.getElementById("question");
+        const inputWrapper = document.querySelector('.input-wrapper');
+
+        let history = [];
+
+        function addMessage(sender, text) {
+            placeholder.style.display = "none";
+            const wrapperDiv = document.createElement("div");
+            wrapperDiv.className = "message-wrapper-" + sender;
+            const messageDiv = document.createElement("div");
+            messageDiv.className = "message " + sender;
+            messageDiv.textContent = text;
+            wrapperDiv.appendChild(messageDiv);
+            chatDiv.appendChild(wrapperDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendQuestion() {
+            const question = input.value.trim();
+            if (!question) return;
+
+            addMessage("user", question);
+            history.push({
+                role: "user",
+                content: question
+            });
+            input.value = "";
+
+            try {
+                const res = await fetch("/ask", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        history,
+                        businesses: localStorage.getItem("ed_businesses_v1"),
+                        budgets: localStorage.getItem("budgetData")
+                    })
+                });
+
+                const data = await res.json();
+                const answer = data.answer || "No response from AI.";
+                history.push({
+                    role: "assistant",
+                    content: answer
+                });
+
+                const aiMsgWrapper = document.createElement("div");
+                aiMsgWrapper.className = "message-wrapper-ai";
+                chatDiv.appendChild(aiMsgWrapper);
+
+                const aiMsg = document.createElement("div");
+                aiMsg.className = "message ai";
+                aiMsgWrapper.appendChild(aiMsg);
+
+                const copyBtn = document.createElement("button");
+                copyBtn.className = "copy-btn";
+                const copyIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"></path><path d="M3 5a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2 0v12h6V5H5z"></path></svg>`;
+                const checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>`;
+                copyBtn.innerHTML = copyIcon;
+                copyBtn.style.display = 'none'; // Hide the button initially
+                aiMsgWrapper.appendChild(copyBtn);
+
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(answer);
+                    copyBtn.innerHTML = checkIcon;
+                    setTimeout(() => {
+                        copyBtn.innerHTML = copyIcon;
+                    }, 2000);
+                });
+
+                // Gemini-style star SVG
+                const svgNS = "http://www.w3.org/2000/svg";
+                const star = document.createElementNS(svgNS, "svg");
+                star.style.marginTop = '-3px';
+                star.setAttribute("width", "30");
+                star.setAttribute("height", "30");
+                star.setAttribute("viewBox", "0 0 24 24");
+                star.style.flexShrink = "0";
+
+                // Gradient
+                const defs = document.createElementNS(svgNS, "defs");
+                const gradient = document.createElementNS(svgNS, "linearGradient");
+                gradient.setAttribute("id", "geminiStarGradient");
+                gradient.setAttribute("x1", "0%");
+                gradient.setAttribute("y1", "0%");
+                gradient.setAttribute("x2", "100%");
+                gradient.setAttribute("y2", "100%");
+
+                const stop1 = document.createElementNS(svgNS, "stop");
+                stop1.setAttribute("offset", "0%");
+                stop1.setAttribute("stop-color", "var(--color-green)");
+
+                const stop2 = document.createElementNS(svgNS, "stop");
+                stop2.setAttribute("offset", "100%");
+                stop2.setAttribute("stop-color", "var(--color-blue)");
+
+                gradient.appendChild(stop1);
+                gradient.appendChild(stop2);
+                defs.appendChild(gradient);
+                star.appendChild(defs);
+
+                // 4-point Gemini-style star
+                const starPath = document.createElementNS(svgNS, "polygon");
+                starPath.setAttribute("points", "12,2 14,9 21,12 14,15 12,22 10,15 3,12 10,9");
+                starPath.setAttribute("fill", "url(#geminiStarGradient)");
+                star.appendChild(starPath);
+
+                aiMsg.appendChild(star);
+
+                const messageContentDiv = document.createElement("div");
+                messageContentDiv.className = "message-content";
+                aiMsg.appendChild(messageContentDiv);
+
+                const plainText = answer.replace(/<[^>]*>/g, '').trim();
+                const characters = plainText.split('');
+                let i = 0;
+
+                function type() {
+                    if (i < characters.length) {
+                        messageContentDiv.textContent += characters[i];
+                        i++;
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        setTimeout(type, 10);
+                    } else {
+                        messageContentDiv.innerHTML = marked.parse(answer);
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        copyBtn.style.display = 'block'; // Show copy button when typing is finished
+                    }
+                }
+                type();
+
+            } catch (err) {
+                addMessage("ai", "⚠️ Error reaching AI.");
+                console.error(err);
+            }
+        }
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") sendQuestion();
+        });
+
+        // Event listeners for the gradient animation
+        input.addEventListener('focus', () => {
+            inputWrapper.classList.add('active');
+        });
+
+        input.addEventListener('blur', () => {
+            inputWrapper.classList.remove('active');
+        });
+
+        // Event listeners for example prompts
+        document.querySelectorAll('.example-prompt').forEach(button => {
+            button.addEventListener('click', () => {
+                const promptText = button.textContent.replace(/^"|"$/g, '');
+                input.value = promptText;
+                sendQuestion();
+            });
+        });
+    </script>
+</body>
+</html>

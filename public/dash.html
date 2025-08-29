@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entrepreneur Dashboard - Static Prototype</title>
+     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    
+    <style>
+      /* --- GLOBAL STYLES & THEME VARIABLES --- */
+      :root {
+        --bg-start: #051426;
+        --bg-end: #061827;
+        --color-primary: #042033;
+        --color-navy: #0E3A5F;
+        --color-growth: #22c55e;
+        --color-accent: #06b6d4;
+        --bg-surface: transparent;
+        --text-muted: #9aa8bf;
+        --text-light: #e6eef8;
+        --radius: 12px;
+        --card-bg: rgba(255, 255, 255, 0.08);
+        --card-border: rgba(255, 255, 255, 0.08);
+      }
+
+      /* Light Mode Variables */
+      body.light-mode {
+        --bg-start: #f0f4f8;
+        --bg-end: #eef2f6;
+        --color-primary: #dfe3e8;
+        --color-navy: #c7d2e0;
+        --color-growth: #10B981;
+        --color-accent: #3B82F6;
+        --text-muted: #6b7280;
+        --text-light: #1a202c;
+        --card-bg: transparent; /* Changed to transparent */
+        --card-border: #c0c0c0;
+      }
+
+      /* --- GENERAL STYLES --- */
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+        background: linear-gradient(180deg, var(--bg-start), var(--bg-end));
+        margin: 0;
+        color: var(--text-light);
+        -webkit-font-smoothing: antialiased;
+        padding-bottom: 0;
+      }
+      
+      /* --- NAVBAR STYLES --- */
+      .new-navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 900px;
+        padding: 20px 25px;
+        background: var(--bg-start);
+        border-radius: var(--radius);
+        margin-top: 20px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .new-navbar .brand-logo {
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--color-growth);
+        margin-right: 15px;
+      }
+      .new-navbar h1 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-light);
+        flex-grow: 1;
+      }
+      .new-navbar nav {
+        display: flex;
+        gap: 15px;
+      }
+      .new-navbar nav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 1rem;
+        padding: 8px 15px;
+        border-radius: var(--radius);
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+      .new-navbar nav a:hover {
+        background: rgba(34, 197, 94, 0.1);
+        color: var(--color-growth);
+      }
+      .new-navbar nav a.new-active {
+        background: linear-gradient(135deg, var(--color-growth) 0%, var(--color-accent) 100%);
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+      }
+      .theme-switch {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        margin-left: 12px;
+      }
+      .theme-switch svg {
+        fill: var(--text-muted);
+        width: 24px;
+        height: 24px;
+        transition: fill 0.3s ease;
+      }
+      .theme-switch:hover svg {
+        fill: var(--text-light);
+      }
+      
+      /* --- MOBILE BOTTOM NAVBAR STYLES --- */
+      .mobile-bottom-navbar {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: var(--bg-start);
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+        justify-content: space-around;
+        padding: 10px 0;
+        z-index: 1000;
+      }
+      .mobile-bottom-navbar .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 5px;
+        border-radius: var(--radius);
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+      .mobile-bottom-navbar .nav-item svg {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 4px;
+        fill: var(--text-muted);
+        transition: fill 0.3s ease;
+      }
+      .mobile-bottom-navbar .nav-item:hover {
+        background: rgba(34, 197, 94, 0.1);
+        color: var(--color-growth);
+      }
+      .mobile-bottom-navbar .nav-item:hover svg {
+        fill: var(--color-growth);
+      }
+      .mobile-bottom-navbar .nav-item.new-active {
+        background: linear-gradient(135deg, var(--color-growth) 0%, var(--color-accent) 100%);
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+      }
+      .mobile-bottom-navbar .nav-item.new-active svg {
+        fill: #fff;
+      }
+      
+      .container {
+        max-width: 1100px;
+        margin: 24px auto;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 20px;
+        padding: 0 16px;
+      }
+      .left {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 14px;
+        border: 1px solid var(--card-border);
+      }
+      
+      /* New light mode specific card styles to override box-shadow */
+      body.light-mode .card {
+        box-shadow: none;
+        backdrop-filter: none;
+      }
+      
+      /* Default dark mode card styles */
+      body:not(.light-mode) .card {
+        box-shadow: 0 8px 24px rgba(2, 6, 23, 0.6);
+        backdrop-filter: blur(8px);
+      }
+
+      .kpi .label {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .kpi .value {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 6px;
+        color: var(--text-light);
+        background: linear-gradient(to right, var(--color-growth), var(--color-accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .kpi .delta {
+        color: var(--color-growth);
+        font-weight: 600;
+        margin-top: 8px;
+      }
+      
+      /* percentage color utilities */
+      .pct-positive {
+        color: var(--color-growth);
+        font-weight: 600;
+      }
+      .pct-negative {
+        color: #ef4444;
+        font-weight: 600;
+      }
+      .pct-neutral {
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+      /* ensure KPI percentage classes override the base .kpi .delta and .kpi .value rules */
+      .kpi .delta.pct-negative,
+      .kpi .value.pct-negative {
+        color: #ef4444 !important;
+      }
+      .kpi .delta.pct-positive,
+      .kpi .value.pct-positive {
+        color: var(--color-growth) !important;
+      }
+      .kpi .delta.pct-neutral,
+      .kpi .value.pct-neutral {
+        color: var(--text-muted) !important;
+      }
+      .card-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-light);
+      }
+      .mt {
+        margin-top: 18px;
+      }
+      
+      /* --- CHART STYLES (THE FIX) --- */
+      canvas {
+        width: 100% !important;
+        height: 220px; /* Default height for desktop */
+      }
+      /* This media query overrides the height for mobile screens */
+      @media (max-width: 640px) {
+        canvas {
+          height: auto !important; /* Overrides the desktop rule to be responsive */
+        }
+      }
+      
+      .overview-charts {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .overview-charts > div {
+        min-width: 0;
+      }
+
+      /* --- RESPONSIVE BEHAVIOR --- */
+      /* Styles for tablets */
+      @media (max-width: 900px) {
+        .container {
+          grid-template-columns: 1fr;
+        }
+        .overview-charts {
+          grid-template-columns: 1fr;
+        }
+      }
+      
+      /* Styles for mobile devices */
+      @media (max-width: 640px) {
+        /* Hide top navigation and theme button on mobile */
+        .new-navbar nav, 
+        .new-navbar .theme-switch-container {
+          display: none;
+        }
+        
+        /* Show the mobile bottom navbar on small screens */
+        .mobile-bottom-navbar {
+          display: flex;
+        }
+      }
+      
+      .small {
+        font-size: 12px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-light);
+        transition: transform 160ms ease, box-shadow 200ms ease, background-color 150ms ease;
+      }
+      .small:hover {
+        transform: translateY(-2px);
+      }
+      .small.danger {
+        border-color: rgba(239, 68, 68, 0.14);
+        background: rgba(239, 68, 68, 0.03);
+        color: #FCA5A5;
+      }
+      .small.danger:hover {
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.12);
+        background: rgba(239, 68, 68, 0.06);
+      }
+      .biz-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .biz-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 6px;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: rgba(255, 255, 255, 0.01);
+      }
+      .biz-list li button {
+        font-size: 12px;
+      }
+      input[type="date"],
+      input[type="number"],
+      input[type="text"],
+      input#business-name {
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: transparent;
+        color: var(--text-light);
+      }
+      select {
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: transparent;
+        color: var(--text-light);
+      }
+      .open {
+        background: linear-gradient(90deg, var(--color-growth), var(--color-accent));
+        color: var(--bg-start);
+        border: none;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(6, 182, 212, 0.08);
+        transition: transform 160ms ease, box-shadow 200ms ease;
+      }
+      .open:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 40px rgba(6, 182, 212, 0.12);
+      }
+      .entry-actions button {
+        margin-left: 8px;
+      }
+      .entries-list {
+        margin-top: 8px;
+      }
+      .entry-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        margin-bottom: 6px;
+        background: rgba(255, 255, 255, 0.01);
+      }
+      .entry-left {
+        display: flex;
+        flex-direction: column;
+      }
+      .entry-amount {
+        font-weight: 700;
+        color: var(--text-light);
+      }
+      .entry-meta {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .entry-actions button {
+        margin-left: 8px;
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: var(--text-muted);
+        padding: 10px 14px;
+        border-radius: 10px;
+        text-decoration: none;
+      }
+      nav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 14px;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <header class="new-navbar">
+      <div class="brand-logo">AI</div>
+      <h1>Eron</h1>
+      <nav>
+        <a href="./index.html">Home</a>
+        <a href="./dash.html" class="new-active">Dashboard</a>
+        <a href="./ynab.html">Budget</a>
+        <a href="./ai-assistant.html">AI</a>
+      </nav>
+      <div class="theme-switch-container">
+        <button id="theme-toggle" class="theme-switch">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.06l1.59-1.591zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM18.894 17.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.06 1.06l1.59 1.591zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM4.293 17.894a.75.75 0 001.06 1.06l1.591-1.59a.75.75 0 00-1.06-1.06l-1.59 1.591zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zM6.106 6.106a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 001.06-1.06L6.106 6.106z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <nav class="mobile-bottom-navbar">
+      <a href="./index.html" class="nav-item">
+        <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="./dash.html" class="nav-item new-active">
+        <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 10a8 8 0 018-8v8h8a8 8 0 01-8 8v-8H2z"></path>
+          <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="ynab.html" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg>
+        <span>Budget</span>
+      </a>
+      <a href="./ai-assistant.html" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 2zM5.404 5.404a.75.75 0 010 1.06l-2.475 2.475a.75.75 0 11-1.06-1.06L4.344 5.404a.75.75 0 011.06 0zm9.192 0a.75.75 0 011.06 0l2.475 2.475a.75.75 0 11-1.06 1.06L15.656 6.464a.75.75 0 010-1.06zM2 10a.75.75 0 01.75-.75h3.5a.75.75 0 010 1.5h-3.5A.75.75 0 012 10zm14.25 0a.75.75 0 010 1.5h-3.5a.75.75 0 010-1.5h3.5zM5.404 14.596a.75.75 0 011.06 0l-2.475 2.475a.75.75 0 01-1.06-1.06l2.475-2.475zm9.192 0a.75.75 0 010 1.06l2.475 2.475a.75.75 0 11-1.06 1.06l-2.475-2.475a.75.75 0 011.06 0zM10 15a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 15z" clip-rule="evenodd"></path></svg>
+        <span>AI</span>
+      </a>
+      <a href="#" id="mobile-theme-toggle" class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.06l1.59-1.591zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM18.894 17.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.06 1.06l1.59 1.591zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM4.293 17.894a.75.75 0 001.06 1.06l1.591-1.59a.75.75 0 00-1.06-1.06l-1.59 1.591zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zM6.106 6.106a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 001.06-1.06L6.106 6.106z" />
+        </svg>
+        <span>Theme</span>
+      </a>
+    </nav>
+    <div class="container">
+      <div class="left">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="card-title">Activities</div>
+            <button id="btn-export-all" class="small">Export All</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <input id="business-name" placeholder="New business name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <button id="btn-add-business" class="small">Add</button>
+          </div>
+          <ul id="business-list" class="biz-list" style="margin-top:12px;"></ul>
+        </div>
+        <div class="card kpi">
+          <div class="label">Net Worth</div>
+          <div class="value" id="net-worth">$0</div>
+          <div class="delta" id="net-delta">+0%</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Profit Margin (YTD)</div>
+          <div class="value" id="roi">0%</div>
+          <div class="delta" id="roi-delta">+0%</div>
+        </div>
+      </div>
+      <div class="main">
+        <div id="overview" class="card">
+          <div class="card-title">Overview</div>
+          <div class="overview-charts">
+            <div>
+              <div style="font-weight:600;margin-bottom:6px">Monthly Revenue</div>
+              <canvas id="salesChart"></canvas>
+            </div>
+            <div>
+              <div style="font-weight:600;margin-bottom:6px">Wealth (Cumulative)</div>
+              <canvas id="wealthChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div id="business-detail" class="card mt" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <button id="btn-back-overview" class="small" style="margin-bottom:6px;display:none">Back</button>
+              <div id="biz-title" style="font-weight:700"></div>
+              <div id="biz-meta" style="font-size:12px;color:var(--text-muted)"></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <label for="period-select">Period</label>
+              <select id="period-select">
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month" selected>Month</option>
+                <option value="year">Year</option>
+              </select>
+              <button id="btn-export-biz" class="small">Export</button>
+              <button id="btn-delete-biz" class="small danger">Delete</button>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <canvas id="bizChart"></canvas>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="entry-date" type="date" />
+            <input id="entry-amount" type="number" placeholder="Amount" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <label style="display:flex;align-items:center;gap:6px"><input id="entry-expense" type="checkbox" /> Expense</label>
+            <input id="entry-desc" type="text" placeholder="Description (optional)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <select id="entry-channel">
+              <option value="sale">Sale</option>
+              <option value="refund">Refund</option>
+              <option value="other">Other</option>
+            </select>
+            <button id="btn-add-entry" class="small">Add Entry</button>
+            <button id="btn-cancel-entry" class="small" style="display:none">Cancel</button>
+          </div>
+          <div class="entries-list">
+            <div style="font-weight:600;margin-bottom:8px">Latest Entries</div>
+            <div id="entries-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br><br><br><br>
+    <script src="./static/app.js"></script>
+    <script>
+      // Theme toggling script
+      const body = document.body;
+      const desktopToggle = document.getElementById('theme-toggle');
+      const mobileToggle = document.getElementById('mobile-theme-toggle');
+      const sunIconPath = `<path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.06l1.59-1.591zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM18.894 17.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.06 1.06l1.59 1.591zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0v2.25a.75.75 0 01-.75.75zM4.293 17.894a.75.75 0 001.06 1.06l1.591-1.59a.75.75 0 00-1.06-1.06l-1.59 1.591zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zM6.106 6.106a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 001.06-1.06L6.106 6.106z" />`;
+      const moonIconPath = `<path d="M9.53 2.59a1.5 1.5 0 012.116 1.116 1.5 1.5 0 01-.39 1.06c-1.226 1.224-2.201 2.5-3.003 3.868A1.5 1.5 0 017.5 9.75a.75.75 0 01-.75-.75v-1.5A.75.75 0 006 6h-1.5a.75.75 0 00-.75.75v1.5a1.5 1.5 0 01-1.5 1.5h-.75a.75.75 0 010-1.5h.75a.75.75 0 00.75-.75V6a.75.75 0 01.75-.75h1.5a1.5 1.5 0 011.5-1.5v-.75a.75.75 0 011.5 0v.75zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93s3.05-7.44 7-7.93v15.86zm-1-17.93v15.86c3.95-.49 7-3.85 7-7.93s-3.05-7.44-7-7.93z" />`;
+      function updateTheme() {
+        const isLightMode = body.classList.toggle('light-mode');
+        localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+        const currentIconPath = isLightMode ? moonIconPath : sunIconPath;
+        if (desktopToggle) desktopToggle.querySelector('svg').innerHTML = currentIconPath;
+        if (mobileToggle) mobileToggle.querySelector('svg').innerHTML = currentIconPath;
+      }
+      const initialTheme = localStorage.getItem('theme');
+      if (initialTheme === 'light') {
+        body.classList.add('light-mode');
+      }
+      const initialIconPath = initialTheme === 'light' ? moonIconPath : sunIconPath;
+      if (desktopToggle) desktopToggle.querySelector('svg').innerHTML = initialIconPath;
+      if (mobileToggle) mobileToggle.querySelector('svg').innerHTML = initialIconPath;
+      if (desktopToggle) desktopToggle.addEventListener('click', updateTheme);
+      if (mobileToggle) mobileToggle.addEventListener('click', updateTheme);
+    </script>
+  </body>
+</html>
